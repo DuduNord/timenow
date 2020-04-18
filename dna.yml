@@ -1,0 +1,10 @@
+name: "timenow"
+type: "neuron"
+author: "DuduNord"
+
+kalliope_supported_version:
+    - 0.6
+
+tags:
+- "advanced time"
+- "remaining time"
