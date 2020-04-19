@@ -15,14 +15,14 @@ class Timenow(NeuronModule):
     def __init__(self, **kwargs):
         super(Timenow, self).__init__(**kwargs)
 
-        self.action = kwargs.get('action', None)
-        self.seconds = kwargs.get('seconds', "0")
-        self.minutes = kwargs.get('minutes', "0")
-        self.hours = kwargs.get('hours', "0")
-        self.months = kwargs.get('months', "0")
+        self.action     = kwargs.get('action', None)
+        self.seconds    = kwargs.get('seconds', "0")
+        self.minutes    = kwargs.get('minutes', "0")
+        self.hours      = kwargs.get('hours', "0")
+        self.months     = kwargs.get('months', "0")
         self.day_months = kwargs.get('day_months', "0")
-        self.years = kwargs.get('years', "0"),
-        self.title = kwargs.get('title', None)
+        self.years      = kwargs.get('years', "0")
+        self.title      = kwargs.get('title', None)
 
         if self._is_parameters_ok():
             if self.action == 'create':
@@ -30,7 +30,6 @@ class Timenow(NeuronModule):
                 self.minutes = self.get_integer_time_parameter(self.minutes)
                 self.hours = self.get_integer_time_parameter(self.hours)
                 timertime = datetime.datetime.now() + datetime.timedelta(hours=self.hours, minutes=self.minutes, seconds=self.seconds)
-                logger.debug("[timenow] timer at : " + str(timertime))
                 # local time and date
                 second = timertime.strftime("%S")        # Second as a decimal number [00,59].
                 minute = timertime.strftime("%M")        # Minute as a decimal number [00,59].
@@ -52,14 +51,18 @@ class Timenow(NeuronModule):
                     "param_title": self.title
                 }
             elif self.action == 'get-remaining-time':
+                self.seconds = self.get_integer_time_parameter(self.seconds)
+                self.minutes = self.get_integer_time_parameter(self.minutes)
+                self.hours = self.get_integer_time_parameter(self.hours)
+                self.day_months = self.get_integer_time_parameter(self.day_months)
+                self.months = self.get_integer_time_parameter(self.months)
+                self.years = self.get_integer_time_parameter(self.years)
                 passed_date = datetime.datetime(self.years,self.months,self.day_months,self.hours,self.minutes,self.seconds)
-                logger.debug("[timenow] cmd: " + self.action + ": date to compare: " + str(passed_date))
                 if passed_date >=  datetime.datetime.now():
                     time_delay =  passed_date - datetime.datetime.now()
                 else:
                     time_delay =  datetime.datetime.now() - passed_date
                 time_delay_total_seconds = round(time_delay.total_seconds())
-                logger.debug("[timenow] cmd: " + self.action + ": difference: " + str(time_delay)+" ou "+str(time_delay_total_seconds)+"sec")
                 reporting_days = time_delay_total_seconds // (3600*24)
                 time_delay_total_seconds = time_delay_total_seconds % (3600*24)
                 reporting_hours = time_delay_total_seconds // 3600
@@ -110,6 +113,7 @@ class Timenow(NeuronModule):
         :param time_parameter: string or integer
         :return: integer
         """
+        logger.debug("[timenow-interger conv] got : " + str(time_parameter) + " as IsInt=" + str(isinstance(time_parameter, int)))
         if time_parameter is not None:
             if not isinstance(time_parameter, int):
                 # try to convert into integer
