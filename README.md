@@ -100,10 +100,25 @@ This synapse will calculate the time when the timer will expire
   neurons:
     - say:
         file_template : "templates/egg_timer.j2"
+
+- name: "timer-remaining-time"     
+  signals:
+    - order: 
+        text: "combien de temps avant la fin de mon minuteur"
+  neurons:
+    - timenow:
+        action: "get-remaining-time"
+        seconds: "{{ kalliope_memory['timer_seconds'] }}"
+        minutes: "{{ kalliope_memory['timer_minutes'] }}"
+        hours: "{{ kalliope_memory['timer_hours'] }}"
+        day_months: "{{ kalliope_memory['timer_days'] }}"
+        months: "{{ kalliope_memory['timer_months'] }}"
+        years: "{{ kalliope_memory['timer_years'] }}"
+        file_template : "templates/egg_timer_remaining.j2"
 ```
 
 ## Template example
-
+egg-cooking.yml
 ```
 le taïmeur de 
 {% if kalliope_memory['passed_hours'] != "0" -%}
@@ -128,4 +143,13 @@ le taïmeur de
     {% endif %}
 {% endif %}
 est terminé
+```
+egg_timer_remaining.j2
+```
+{# donne le temps restant avant la fin du timer > Month et Year sont toujours à 0 car il serait difficile de prévoir le nombre de mois, sachant qu'il y a des mois à 29/30/31 jours#}
+il reste 
+{% if day_months != "0" -%} {{ day_months }} jour {%- endif %} 
+{% if hours != "0" -%} {% if hours == "1" -%} une heure {% else %} {{ hours }} heure {%- endif %} {% endif %} 
+{% if minutes != "0" -%} {% if minutes == "1" -%} une minute {% else %} {{ minutes }} minute {%- endif %} {%- endif %} 
+{% if seconds != "0" -%} {% if seconds == "1" -%} une seconde {% else %} {{ seconds }} seconde {%- endif %} {%- endif %}
 ```
